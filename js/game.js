@@ -5,7 +5,7 @@ var config = {
     physics:{
         default:'arcade',
         arcade:{
-            debug: false,
+            debug: true,
             gravity:{y:0}
         }
     },
@@ -75,10 +75,9 @@ function preload() {
 
     this.load.image('antorcha', 'assets/antorcha.png');
 
-    this.load.spritesheet('antorchaencendida', 
-        'assets/antorchaencendida.png',
-        { frameWidth: 32, frameHeight: 48 }
-    );
+    this.load.image('antorchaencendida', 'assets/antorchaencendida.png');
+      
+    this.load.image('tanque', 'assets/tanque.png');
 }
    
 function create() {
@@ -155,34 +154,27 @@ function create() {
     this.physics.add.overlap(player, NPC, hablar, null, this);
     this.physics.add.overlap(player, NPC, pasar, null, this);
 
-    enemigo = this.physics.add.sprite(1900,1500,'enemigo').setScale(0.2);
-    enemigo.body.setSize(1200,1200);
+    enemigo = this.physics.add.sprite(1900,1500,'tanque').setScale(0.8);
+    enemigo.body.setSize(300,300);
 
     this.physics.add.overlap(player,enemigo,perseguir, null, this);
     this.physics.add.overlap(player, enemigo, matar, null, this);
 
     this.physics.add.collider(enemigo, obstaculos);
 
-    antorcha1 = this.physics.add.sprite(1730,1020, 'antorcha').setScale(1);
-    antorcha2 = this.physics.add.sprite(2340,800, 'antorcha').setScale(1);
-    antorcha3 = this.physics.add.sprite(1695,185, 'antorcha').setScale(1);
-    antorcha4 = this.physics.add.sprite(2180,345, 'antorcha').setScale(1);
+    antorcha1 = this.physics.add.sprite(1730,1030, 'antorcha').setScale(0.8);
+    antorcha2 = this.physics.add.sprite(2340,810, 'antorcha').setScale(0.8);
+    antorcha3 = this.physics.add.sprite(1695,195, 'antorcha').setScale(0.8);
+    antorcha4 = this.physics.add.sprite(2180,355, 'antorcha').setScale(0.8);
 
     this.physics.add.overlap(player,antorcha1,puzle1, null, this);
     this.physics.add.overlap(player,antorcha2,puzle2, null, this);
     this.physics.add.overlap(player,antorcha3,puzle3, null, this);
     this.physics.add.overlap(player,antorcha4,puzle4, null, this);
 
-    enemigo2 = this.physics.add.sprite(1600,1400,'enemigo').setScale(0.1);
+    enemigo2 = this.physics.add.sprite(1600,1400,'enemigo').setScale(0.15);
     enemigo2.body.setSize(1200,1200);
     this.physics.add.overlap(player,enemigo2,matarpeque, null, this);
-
-    this.anims.create({
-        key: 'encender',
-        frames: this.anims.generateFrameNumbers('antorchaencendida', { start: 0, end: 5 }),
-        frameRate: 10,
-        repeat: 0
-    });
 
 }
 
@@ -441,7 +433,8 @@ function puzle1()
     if(KeyE.isDown && pieza==0)
     {
         pieza=1;
-        antorcha1.play('encender');
+        //antorcha1.destroy;
+        antorchae1 = this.physics.add.sprite(1730,1030, 'antorchaencendida').setScale(0.8);
     }
 }
 
@@ -450,7 +443,8 @@ function puzle2()
     if(KeyE.isDown && pieza==1)
     {
         pieza=2;
-        antorcha2.play('encender');
+        antorcha2.destroy;
+        antorchae2 = this.physics.add.sprite(2340,810, 'antorchaencendida').setScale(0.8);
     }
 }
 
@@ -459,7 +453,8 @@ function puzle3()
     if(KeyE.isDown && pieza==2)
     {
         pieza=3;
-        antorcha3.play('encender');
+        antorcha3.destroy;
+        antorchae3 = this.physics.add.sprite(1695,195, 'antorchaencendida').setScale(0.8);
     }
 }
 
@@ -468,7 +463,8 @@ function puzle4()
     if(KeyE.isDown && pieza==3)
     {
         pieza=4;
-        antorcha4.play('encender');
+        antorcha4.destroy;
+        antorchae4 = this.physics.add.sprite(2180,355, 'antorchaencendida').setScale(0.8);
         cofre = this.physics.add.sprite(1860, 470, 'cofre').setScale(0.4);
     }
 }
