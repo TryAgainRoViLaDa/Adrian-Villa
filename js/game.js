@@ -18,12 +18,14 @@ var config = {
 
 var game = new Phaser.Game(config);
 
+//Dinero
 var dinero=0;
-var comida=0;
 
+//direcciones de cerdos
 var direccion1=1;
 var direccion2=1;
 
+//Variables de la interaccion
 var cd=0;
 var cd2=100;
 var mensaje=0;
@@ -31,19 +33,29 @@ var scorecd=0;
 var final=20;
 var inicio=0;
 var cd3=0;
-
 var finalconversacion=true;
 
-var velocidad=200;
+//Velocidad e los enemigos
+var velocidad=150;
 
+//Variable para que empiece la persecución
 var seguir=false;
+var seguir2=false;
 
+//Variables de combate
 var vidaenemigo=true;
 var golpeneemigo=0;
 var cdenemigo=0;
+var vidaenemigo2=true;
+
+var vidatanque=3;
+
+//PUZLE
 var pieza=0;
 
-var llave=false;
+//player
+var vidaplayer=50;
+
 function preload() {
 
     this.load.image('gameTiles', 'tileset/NatureTileset.png');
@@ -56,41 +68,35 @@ function preload() {
 
     this.load.image('cerdo', 'assets/cerdo.png');
 
-    this.load.image('inventario', 'assets/inventario.png');
-
-    this.load.image('chuleta', 'assets/chuleta.png');
-
     this.load.image('NPC', 'assets/NPC.png');
 
     this.load.image('texto', 'assets/bafarada1.png');
 
     this.load.image('texto2', 'assets/bafarada2.png');
 
-    this.load.image('enemigo', 'assets/enemigo.png');
-
-    this.load.image('estatuaapagada', 'assets/estatuaapagada.png');
-    this.load.image('estatuaencendida', 'assets/estatuaencendida.png')
+    this.load.image('enemigobasico', 'assets/enemigo.png');
 
     this.load.image('cofre', 'assets/cofre.png');
-
-    this.load.image('antorcha', 'assets/antorcha.png');
-
-    this.load.image('antorchaencendida', 'assets/antorchaencendida.png');
       
     this.load.image('tanque', 'assets/tanque.png');
+
+    this.load.image('hoguerapagada', 'assets/hoguera1.png');
+
+    this.load.image('hogueraencendida', 'assets/hoguera8.png');
 }
    
 function create() {
 
+    //Capas tilemap
     map = this.make.tilemap({key:'tilemap'});
-
     tileset = map.addTilesetImage('nature','gameTiles');
-
     capa = map.createDynamicLayer(0, tileset);
 
+    //colisiones
     obstaculos = map.createDynamicLayer(1, tileset);
     obstaculos.setCollisionByProperty({colisiones: true});
 
+    //Entradas de teclado
     KeyA=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     KeyD=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     KeyW=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -99,11 +105,14 @@ function create() {
     KeyE=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     KeyQ=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
+    //Sprite player
     player = this.physics.add.sprite(2600,2365, 'attack').setScale(0.1);
-
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+    this.physics.add.collider(player, obstaculos);
+    vidas = this.add.text(200, 25,'Vidas:' + vidaplayer, { fontSize: '20px', fill: 'white' }).setScrollFactor(0);
 
+    //Animación player 
     this.anims.create({
         key:'attack',
         frames: this.anims.generateFrameNames('attack', {
@@ -115,29 +124,23 @@ function create() {
         frameRate:15
     });
 
-    cartera = this.add.sprite(40,50,'moneda').setScale(0.1);
-
+    //Monedas
     monedaList = this.physics.add.group();
-
     this.physics.add.overlap(player, monedaList, recolectar, null, this);
+    dineros = this.add.text(25, 25, + dinero, { fontSize: '20px', fill: 'white' }).setScrollFactor(0);
 
-    dineros = this.add.text(70, 50,+ dinero, { fontSize: '20px', fill: 'white' });
-
+    //Cerdo1
     cerdo1 = this.physics.add.sprite(2140,2365,'cerdo').setScale(0.2);
     this.physics.add.overlap(player, cerdo1, ataque1, null, this);
 
+    //Cerdo2
     cerdo2 = this.physics.add.sprite(2120,2430,'cerdo').setScale(0.1);
     this.physics.add.overlap(player, cerdo2, ataque2, null, this);
-
+    
+    //Camara
     this.cameras.main.setBounds(0, 0, 1280 * 2, 1280 * 2);
     this.physics.world.setBounds(0, 0, 1280 * 2, 1280 * 2);
     this.cameras.main.startFollow(player, true, 0.05, 0.05);
-
-    inventario = this.add.sprite(700,80, 'inventario').setScale(0.3);
-    chuleta = this.add.sprite(595,40, 'chuleta').setScale(0.3);
-    scoreText1 = this.add.text(605, 45,+ chuleta, { fontSize: '20px', fill: 'white' });
-
-    this.physics.add.collider(player, obstaculos);
 
     //Sprites del NPC
     NPC = this.physics.add.sprite(1800,1800, 'NPC');
@@ -149,47 +152,54 @@ function create() {
     player.setCollideWorldBounds(true);
     player.body.setSize(100, 300, 50, 25);
 
-//Interacciones entre el player y el NPC
+    //Interacciones entre el player y el NPC
     this.physics.add.overlap(player, NPC, interaccion, null, this);
     this.physics.add.overlap(player, NPC, hablar, null, this);
     this.physics.add.overlap(player, NPC, pasar, null, this);
 
-    enemigo = this.physics.add.sprite(1900,1500,'tanque').setScale(0.8);
-    enemigo.body.setSize(300,300);
+    //Enemigo basico
+    enemigobasico = this.physics.add.sprite(1900,1500,'enemigobasico').setScale(0.15);
+    enemigobasico.body.setSize(1200,1200);
+    this.physics.add.overlap(player,enemigobasico,perseguir, null, this);
+    this.physics.add.overlap(player, enemigobasico, matarpeque, null, this);
+    this.physics.add.collider(enemigobasico, obstaculos);
 
-    this.physics.add.overlap(player,enemigo,perseguir, null, this);
-    this.physics.add.overlap(player, enemigo, matar, null, this);
+    //Enemigo tanque
+    tanque = this.physics.add.sprite(1600,1400,'tanque').setScale(0.8);
+    tanque.body.setSize(300,300);
+    this.physics.add.overlap(player,tanque,matar, null, this);
+    this.physics.add.overlap(player,tanque,perseguir2, null, this);
+    this.physics.add.collider(tanque, obstaculos);
 
-    this.physics.add.collider(enemigo, obstaculos);
-
-    antorcha1 = this.physics.add.sprite(1730,1030, 'antorcha').setScale(0.8);
-    antorcha2 = this.physics.add.sprite(2340,810, 'antorcha').setScale(0.8);
-    antorcha3 = this.physics.add.sprite(1695,195, 'antorcha').setScale(0.8);
-    antorcha4 = this.physics.add.sprite(2180,355, 'antorcha').setScale(0.8);
-
+    //PUZLE
+    antorcha1 = this.physics.add.sprite(1730,1030, 'hoguerapagada').setScale(0.8);
+    antorcha2 = this.physics.add.sprite(2340,810, 'hoguerapagada').setScale(0.8);
+    antorcha3 = this.physics.add.sprite(1695,195, 'hoguerapagada').setScale(0.8);
+    antorcha4 = this.physics.add.sprite(2180,355, 'hoguerapagada').setScale(0.8);
     this.physics.add.overlap(player,antorcha1,puzle1, null, this);
     this.physics.add.overlap(player,antorcha2,puzle2, null, this);
     this.physics.add.overlap(player,antorcha3,puzle3, null, this);
     this.physics.add.overlap(player,antorcha4,puzle4, null, this);
 
-    enemigo2 = this.physics.add.sprite(1600,1400,'enemigo').setScale(0.15);
-    enemigo2.body.setSize(1200,1200);
-    this.physics.add.overlap(player,enemigo2,matarpeque, null, this);
+    
 
 }
 
 function update()
 {
+    //Variable para la conversación
     if(cd>0)
     {
         cd=cd-1;
     }
 
+    //Variable para destriur la conversación
     if(cd3==1) 
     {
         scorecd=scorecd-1;
     }
 
+    //Movimientos del player
     if (KeyA.isDown)
     {
         player.setVelocityX(-200);
@@ -216,12 +226,13 @@ function update()
         player.setVelocityY(0);
     }
 
-
+    //Ataque
      if (KeyQ.isDown)
     {
         player.play('attack');
     }
 
+    //conversación
     if (SPACE.isDown && finalconversacion==false)
     {
         final=final-1;
@@ -232,33 +243,34 @@ function update()
         }
     } 
 
+    //Funciones
     movercerdo();
     girar();
     movercerdo2();
     girar2();
     atacar();
+    atacar2();
 }
 
+//recolectar del cerdo grande
 function recolectar(objeto1, objeto2)
 {
     objeto2.destroy();
     var aleatorio = Phaser.Math.Between(1, 10);
     dinero=dinero+aleatorio;
     dineros = dineros.setText(+ dinero);
-    comida=comida+1;
-    scoreText1 = scoreText1.setText(+ comida);
 }
 
+//recolectar del cerdo pequeño
 function recolectar2(objeto1, objeto2)
 {
     objeto2.destroy();
     var aleatorio = Phaser.Math.Between(1, 10);
     dinero=dinero+aleatorio;
     dineros = dineros.setText(+ dinero);
-    comida=comida+1;
-    scoreText1 = scoreText1.setText(+ comida);
 }
 
+//Matar al cerdo grande
 function ataque1(objeto1, objeto2)
 {
     if(KeyQ.isDown)
@@ -268,6 +280,7 @@ function ataque1(objeto1, objeto2)
     }
 }
 
+//Matar al cerdo pequeño
 function ataque2(objeto1, objeto2)
 {
     if(KeyQ.isDown)
@@ -276,7 +289,8 @@ function ataque2(objeto1, objeto2)
         var moneda2 = monedaList.create(cerdo2.x,cerdo2.y,'moneda').setScale(0.08);
     }
 }
-    
+
+//Mover cerdo grande
 function movercerdo()
 {  
     if(direccion1==1)
@@ -290,6 +304,7 @@ function movercerdo()
     }
 }
 
+//girar cerdo grande
 function girar()
 {
     if(direccion1==0)
@@ -304,6 +319,7 @@ function girar()
     }
 }
 
+//mover cerdo pequeño
 function movercerdo2()
 {  
     if(direccion2==1)
@@ -317,6 +333,7 @@ function movercerdo2()
     }
 }
 
+//girar cerdo pequeño
 function girar2()
 {
     if(direccion2==0)
@@ -380,11 +397,48 @@ function destruir()
     finalconversacion=true;
 }
 
+//Enemigo basico te persigue
 function perseguir()
 {
    if(vidaenemigo==true)
     {
         seguir=true;
+    }
+}
+
+//Enemigo basico te ataca
+function atacar()
+{
+   if(seguir==true) 
+    {
+        enemigobasico.direccion = new Phaser.Math.Vector2(player.x-enemigobasico.x, player.y-enemigobasico.y);
+        enemigobasico.direccion.normalize();
+        enemigobasico.setVelocityX(velocidad * enemigobasico.direccion.x);
+        enemigobasico.setVelocityY(velocidad * enemigobasico.direccion.y);
+    }
+}
+
+//Matar enemigo basico
+function matarpeque()
+{  
+    if (KeyQ.isDown)
+    {
+        if(golpeneemigo==0)
+        {
+        enemigobasico.destroy();
+        seguir=false;
+        vidaenemigo=false;
+        }
+    }
+}
+
+//tanque te persigue
+function perseguir2()
+{
+   if(vidaenemigo2==true)
+    {
+        seguir2=true;
+        
         if(cdenemigo>0)
         {
             cdenemigo=cdenemigo-1;
@@ -392,49 +446,52 @@ function perseguir()
     }
 }
 
-function atacar()
+//tanque ataca
+function atacar2()
 {
-   if(seguir==true) 
+   if(seguir2==true) 
     {
-        enemigo.direccion = new Phaser.Math.Vector2(player.x-enemigo.x, player.y-enemigo.y);
-        enemigo.direccion.normalize();
-        enemigo.setVelocityX(velocidad * enemigo.direccion.x);
-        enemigo.setVelocityY(velocidad * enemigo.direccion.y);
+        tanque.direccion = new Phaser.Math.Vector2(player.x-tanque.x, player.y-tanque.y);
+        tanque.direccion.normalize();
+        tanque.setVelocityX(velocidad * tanque.direccion.x);
+        tanque.setVelocityY(velocidad * tanque.direccion.y);
+        vidaplayer=vidaplayer-1;
     }
 }
 
+//matar al tanque
 function matar()
 {
-    
-    if (KeyQ.isDown & cdenemigo==0)
+    if (KeyQ.isDown)
     {
-
-        if(golpeneemigo==0)
-        {
-            golpeneemigo=1;
-            cdenemigo=50;
-        }
-        else if(golpeneemigo==1)
-        {
-            golpeneemigo=2;
-            cdenemigo=50;
-        }
-        else if(golpeneemigo==2)
-        {
-        enemigo.destroy();
-        seguir=false;
-        vidaenemigo=false;
-        }
+      if(vidatanque==1 && cdenemigo==0)
+      {
+        tanque.destroy();
+        seguir2=false;
+        vidaenemigo2=false;
+      }
+      else if(vidatanque==2 && cdenemigo==0)
+      {
+        vidatanque=1;
+        cdenemigo=50;
+      }
+      else if(vidatanque==3 && cdenemigo==0)
+      {
+        vidatanque=2;
+        cdenemigo=50;
+      }
+        
     }
 }
 
+//PUZLE
 function puzle1()
 {
     if(KeyE.isDown && pieza==0)
     {
         pieza=1;
         //antorcha1.destroy;
-        antorchae1 = this.physics.add.sprite(1730,1030, 'antorchaencendida').setScale(0.8);
+        antorchae1 = this.physics.add.sprite(1730,1030, 'hogueraencendida').setScale(0.8);
     }
 }
 
@@ -444,7 +501,7 @@ function puzle2()
     {
         pieza=2;
         antorcha2.destroy;
-        antorchae2 = this.physics.add.sprite(2340,810, 'antorchaencendida').setScale(0.8);
+        antorchae2 = this.physics.add.sprite(2340,810, 'hogueraencendida').setScale(0.8);
     }
 }
 
@@ -454,7 +511,7 @@ function puzle3()
     {
         pieza=3;
         antorcha3.destroy;
-        antorchae3 = this.physics.add.sprite(1695,195, 'antorchaencendida').setScale(0.8);
+        antorchae3 = this.physics.add.sprite(1695,195, 'hogueraencendida').setScale(0.8);
     }
 }
 
@@ -464,15 +521,8 @@ function puzle4()
     {
         pieza=4;
         antorcha4.destroy;
-        antorchae4 = this.physics.add.sprite(2180,355, 'antorchaencendida').setScale(0.8);
+        antorchae4 = this.physics.add.sprite(2180,355, 'hogueraencendida').setScale(0.8);
         cofre = this.physics.add.sprite(1860, 470, 'cofre').setScale(0.4);
     }
 }
 
-function matarpeque()
-{
-    if(KeyQ.isDown)
-    {
-        enemigo2.destroy();
-    }
-}
