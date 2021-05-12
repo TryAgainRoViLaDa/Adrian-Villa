@@ -52,6 +52,7 @@ var golpeneemigo=0;
 var cdenemigo=0;
 var vidaenemigo2=true;
 var ataquetanque=0;
+var ataquebasico=0;
 
 var vidatanque=3;
 
@@ -59,40 +60,31 @@ var vidatanque=3;
 var pieza=0;
 
 //player
-var vidaplayer=50;
+var vidaplayer=10;
 
 //Speedboost
 var SBActivado = false;
-var velocidadP = 200;
+var velocidadP = 300;
 var Time = 0;
 var SBTime = 100;
 
-function preload() {
+var inmovil = false;
+var personajevivo=true;
 
+function preload() 
+{
     this.load.image('gameTiles', 'tileset/NatureTileset.png');
-
     this.load.tilemapTiledJSON('tilemap', 'maps/nivellago.json');
-
     this.load.atlas('attack','assets/attack.png', 'assets/attack_atlas.json');
-
     this.load.image('moneda', 'assets/monedas.png');
-
     this.load.image('cerdo', 'assets/cerdo.png');
-
     this.load.image('NPC', 'assets/NPC.png');
-
     this.load.image('texto', 'assets/bafarada1.png');
-
     this.load.image('texto2', 'assets/bafarada2.png');
-
     this.load.image('enemigobasico', 'assets/enemigo.png');
-
-    this.load.image('cofre', 'assets/cofre.png');
-      
+    this.load.image('cofre', 'assets/cofre.png');     
     this.load.image('tanque', 'assets/tanque.png');
-
     this.load.image('hoguerapagada', 'assets/hoguera1.png');
-
     this.load.image('hogueraencendida', 'assets/hoguera8.png');
 }
    
@@ -117,7 +109,7 @@ function create() {
     KeyQ=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     //Sprite player
-    player = this.physics.add.sprite(2600,2365, 'attack').setScale(0.1);
+    player = this.physics.add.sprite(2600,2365, 'attack').setScale(0.08);
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     this.physics.add.collider(player, obstaculos);
@@ -132,7 +124,7 @@ function create() {
             end: 10,
         }),
         repeat:0,
-        frameRate:15
+        frameRate:30
     });
 
     //Monedas
@@ -161,7 +153,7 @@ function create() {
     //Colision con el final de la pantalla
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
-    player.body.setSize(100, 300, 50, 25);
+    player.body.setSize(200,100);
 
     //Interacciones entre el player y el NPC
     this.physics.add.overlap(player, NPC, interaccion, null, this);
@@ -170,14 +162,14 @@ function create() {
 
     //Enemigo basico
     enemigobasico = this.physics.add.sprite(1900,1500,'enemigobasico').setScale(0.15);
-    enemigobasico.body.setSize(1200,1200);
+    enemigobasico.body.setSize(350,350);
     this.physics.add.overlap(player,enemigobasico,perseguir, null, this);
     this.physics.add.overlap(player, enemigobasico, matarpeque, null, this);
     this.physics.add.collider(enemigobasico, obstaculos);
 
     //Enemigo tanque
     tanque = this.physics.add.sprite(1600,1400,'tanque').setScale(0.8);
-    tanque.body.setSize(300,300);
+    tanque.body.setSize(200,200);
     this.physics.add.overlap(player,tanque,matar, null, this);
     this.physics.add.overlap(player,tanque,perseguir2, null, this);
     this.physics.add.collider(tanque, obstaculos);
@@ -197,25 +189,25 @@ function create() {
 
 function update()
 {
-    //Variable para la conversación
-    if(cd>0)
-    {
-        cd=cd-1;
-    }
+    //Funciones
+    movercerdo();
+    girar();
+    movercerdo2();
+    girar2();
+    atacar();
+    atacar2();
+    Speedboost();
+    todosloscd();
+    conversar();
+    moveplayer();
+}
 
-    //Variable para destriur la conversación
-    if(cd3==1) 
+function moveplayer()
+   { 
+     //Movimientos del player
+    if(inmovil==false)
     {
-        scorecd=scorecd-1;
-    }
-
-    //Variable combate
-    if(ataquetanque>0)
-    {
-      ataquetanque=ataquetanque-1;
-    }
-    //Movimientos del player
-    if (KeyA.isDown)
+      if (KeyA.isDown)
     {
         player.setVelocityX(-velocidadP);
     }
@@ -240,14 +232,17 @@ function update()
     {
         player.setVelocityY(0);
     }
-
     //Ataque
      if (SPACE.isDown)
     {
         player.play('attack');
     }
+    }
+   }
 
-    //conversación
+function conversar()
+{
+//conversación
     if (SPACE.isDown && finalconversacion==false)
     {
         final=final-1;
@@ -256,21 +251,33 @@ function update()
             destruir();
             final=10;
         }
-    } 
-
-    //Funciones
-    movercerdo();
-    girar();
-    movercerdo2();
-    girar2();
-    atacar();
-    atacar2();
-    Speedboost();
+    }
 }
-
-function cd()
+function todosloscd()
 {
+ //Variable para la conversación
+    if(cd>0)
+    {
+        cd=cd-1;
+    }
 
+    //Variable para destriur la conversación
+    if(cd3==1) 
+    {
+        scorecd=scorecd-1;
+    }
+
+    //Variable combate
+    if(ataquetanque>0)
+    {
+      ataquetanque=ataquetanque-1;
+    }
+
+    //Variable combate
+    if(ataquebasico>0)
+    {
+      ataquebasico=ataquebasico-1;
+    }
 }
 
 //recolectar del cerdo grande
@@ -424,19 +431,34 @@ function perseguir()
    if(vidaenemigo==true)
     {
         seguir=true;
+        if(ataquebasico==0)
+        {
+          vidaplayer=vidaplayer-1;
+          vidas = vidas.setText('Vidas: '+ vidaplayer);
+          ataquebasico=80;
+
+          if (vidaplayer <= 0) 
+          {
+            player.destroy();
+            inmovil = true;
+            personajevivo=false;
+          }
+        }
     }
+    
 }
 
 //Enemigo basico te ataca
 function atacar()
 {
-   if(seguir==true) 
+   if(seguir==true & inmovil ==false) 
     {
         enemigobasico.direccion = new Phaser.Math.Vector2(player.x-enemigobasico.x, player.y-enemigobasico.y);
         enemigobasico.direccion.normalize();
         enemigobasico.setVelocityX(velocidad * enemigobasico.direccion.x);
-        enemigobasico.setVelocityY(velocidad * enemigobasico.direccion.y);
+        enemigobasico.setVelocityY(velocidad * enemigobasico.direccion.y);   
     }
+    
 }
 
 //Matar enemigo basico
@@ -460,9 +482,18 @@ function perseguir2()
     {
         seguir2=true;
         
-        if(cdenemigo>0)
+        if(ataquetanque==0)
         {
-            cdenemigo=cdenemigo-1;
+          vidaplayer=vidaplayer-3;
+          vidas = vidas.setText('Vidas: '+ vidaplayer);
+          ataquetanque=100;
+
+          if (vidaplayer <= 0) 
+          {
+            player.destroy();
+            inmovil = true;
+            personajevivo=false;
+          }
         }
     }
 }
@@ -470,18 +501,13 @@ function perseguir2()
 //tanque ataca
 function atacar2()
 {
-   if(seguir2==true) 
+   if(seguir2==true && personajevivo==true) 
     {
         tanque.direccion = new Phaser.Math.Vector2(player.x-tanque.x, player.y-tanque.y);
         tanque.direccion.normalize();
         tanque.setVelocityX(velocidad * tanque.direccion.x);
         tanque.setVelocityY(velocidad * tanque.direccion.y);
-        if(ataquetanque==0)
-        {
-          vidaplayer=vidaplayer-5;
-          vidas = vidas.setText('Vidas: '+ vidaplayer);
-          ataquetanque=100;
-        }
+        
     }
 }
 
