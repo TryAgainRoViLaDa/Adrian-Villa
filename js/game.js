@@ -61,6 +61,12 @@ var pieza=0;
 //player
 var vidaplayer=50;
 
+//Speedboost
+var SBActivado = false;
+var velocidadP = 200;
+var Time = 0;
+var SBTime = 100;
+
 function preload() {
 
     this.load.image('gameTiles', 'tileset/NatureTileset.png');
@@ -115,7 +121,7 @@ function create() {
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     this.physics.add.collider(player, obstaculos);
-    vidas = this.add.text(200, 25,'Vidas:' + vidaplayer, { fontSize: '20px', fill: 'white' }).setScrollFactor(0);
+    vidas = this.add.text(200, 25,'Vidas:' + vidaplayer, { fontSize: '20px', fill: 'black' }).setScrollFactor(0);
 
     //Animación player 
     this.anims.create({
@@ -132,7 +138,7 @@ function create() {
     //Monedas
     monedaList = this.physics.add.group();
     this.physics.add.overlap(player, monedaList, recolectar, null, this);
-    dineros = this.add.text(25, 25, + dinero, { fontSize: '20px', fill: 'white' }).setScrollFactor(0);
+    dineros = this.add.text(0, 50, 'Monedas: '+ dinero, { fontSize: '20px', fill: 'black' }).setScrollFactor(0);
 
     //Cerdo1
     cerdo1 = this.physics.add.sprite(2140,2365,'cerdo').setScale(0.2);
@@ -186,8 +192,7 @@ function create() {
     this.physics.add.overlap(player,antorcha3,puzle3, null, this);
     this.physics.add.overlap(player,antorcha4,puzle4, null, this);
 
-    
-
+    CoolDown = this.add.text(0, 20, 'CD: 0', { fontSize: '20px', fill: 'black' }).setScrollFactor(0);
 }
 
 function update()
@@ -212,11 +217,11 @@ function update()
     //Movimientos del player
     if (KeyA.isDown)
     {
-        player.setVelocityX(-200);
+        player.setVelocityX(-velocidadP);
     }
     else if(KeyD.isDown)
     {
-        player.setVelocityX(200);
+        player.setVelocityX(velocidadP);
     }
     else
     {
@@ -225,11 +230,11 @@ function update()
 
     if (KeyW.isDown)
     {
-        player.setVelocityY(-200);
+        player.setVelocityY(-velocidadP);
     }
     else if (KeyS.isDown)
     {
-        player.setVelocityY(200);
+        player.setVelocityY(velocidadP);
     }
     else
     {
@@ -237,7 +242,7 @@ function update()
     }
 
     //Ataque
-     if (KeyQ.isDown)
+     if (SPACE.isDown)
     {
         player.play('attack');
     }
@@ -260,6 +265,12 @@ function update()
     girar2();
     atacar();
     atacar2();
+    Speedboost();
+}
+
+function cd()
+{
+
 }
 
 //recolectar del cerdo grande
@@ -283,7 +294,7 @@ function recolectar2(objeto1, objeto2)
 //Matar al cerdo grande
 function ataque1(objeto1, objeto2)
 {
-    if(KeyQ.isDown)
+    if(SPACE.isDown)
     {
         objeto2.destroy();
         var moneda2 = monedaList.create(cerdo1.x,cerdo1.y,'moneda').setScale(0.08);
@@ -293,7 +304,7 @@ function ataque1(objeto1, objeto2)
 //Matar al cerdo pequeño
 function ataque2(objeto1, objeto2)
 {
-    if(KeyQ.isDown)
+    if(SPACE.isDown)
     {
         objeto2.destroy();
         var moneda2 = monedaList.create(cerdo2.x,cerdo2.y,'moneda').setScale(0.08);
@@ -431,7 +442,7 @@ function atacar()
 //Matar enemigo basico
 function matarpeque()
 {  
-    if (KeyQ.isDown)
+    if (SPACE.isDown)
     {
         if(golpeneemigo==0)
         {
@@ -477,7 +488,7 @@ function atacar2()
 //matar al tanque
 function matar()
 {
-    if (KeyQ.isDown)
+    if (SPACE.isDown)
     {
       if(vidatanque==1 && cdenemigo==0)
       {
@@ -541,3 +552,43 @@ function puzle4()
     }
 }
 
+function Speedboost()
+{
+    if(Time <= 0)
+    {
+        if(KeyQ.isDown)
+        {
+            SBActivado = true;
+        }
+    }
+
+    if(SBActivado == true)
+    { 
+        if(SBTime >= 0)
+        {
+            velocidadP = 500;
+        }
+        else if(SBTime <= 0)
+        {
+            SBActivado = false;
+            velocidadP = 300;
+        }
+        SBTime--;
+        Time = 240;
+    }
+
+    if(SBActivado == false)
+    {
+        decrementarCoolDown();
+        SBTime = 100;
+    }
+}
+
+function decrementarCoolDown()
+{
+    if(Time >= 1)
+    {
+        Time = Time - 1;
+        CoolDown = CoolDown.setText('CD: ' +Time);
+    }
+}
