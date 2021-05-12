@@ -86,6 +86,7 @@ function preload()
     this.load.image('tanque', 'assets/tanque.png');
     this.load.image('hoguerapagada', 'assets/hoguera1.png');
     this.load.image('hogueraencendida', 'assets/hoguera8.png');
+    this.load.image('heart', 'assets/hearth.png');
 }
    
 function create() {
@@ -185,6 +186,10 @@ function create() {
     this.physics.add.overlap(player,antorcha4,puzle4, null, this);
 
     CoolDown = this.add.text(0, 20, 'CD: 0', { fontSize: '20px', fill: 'black' }).setScrollFactor(0);
+
+    heartList = this.physics.add.group();
+
+    this.physics.add.overlap(player, heartList, aumentarVida, null, this);
 }
 
 function update()
@@ -278,6 +283,12 @@ function todosloscd()
     {
       ataquebasico=ataquebasico-1;
     }
+
+    if(cdenemigo>0)
+    {
+      cdenemigo=cdenemigo-1;
+    }
+    
 }
 
 //recolectar del cerdo grande
@@ -472,6 +483,12 @@ function matarpeque()
         seguir=false;
         vidaenemigo=false;
         }
+        
+        if(vidaplayer<10)
+      {
+        var heart = heartList.create(enemigobasico.x, enemigobasico.y, 'heart');
+        heart.setScale(0.1, 0.1);
+      }
     }
 }
 
@@ -616,5 +633,15 @@ function decrementarCoolDown()
     {
         Time = Time - 1;
         CoolDown = CoolDown.setText('CD: ' +Time);
+    }
+}
+
+function aumentarVida(objeto1, objeto2)
+{
+    if(inmovil==false)
+    {
+    vidaplayer = vidaplayer + 3;
+    vidas = vidas.setText('Vidas: '+ vidaplayer);
+    objeto2.destroy();
     }
 }
