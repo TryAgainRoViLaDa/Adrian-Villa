@@ -2,6 +2,10 @@ var config = {
     type: Phaser.AUTO,
     width:850,
     height:600,
+    fps: {
+      target:60,
+      forceSetTimeOut:true
+    },
     physics:{
         default:'arcade',
         arcade:{
@@ -47,6 +51,7 @@ var vidaenemigo=true;
 var golpeneemigo=0;
 var cdenemigo=0;
 var vidaenemigo2=true;
+var ataquetanque=0;
 
 var vidatanque=3;
 
@@ -199,6 +204,11 @@ function update()
         scorecd=scorecd-1;
     }
 
+    //Variable combate
+    if(ataquetanque>0)
+    {
+      ataquetanque=ataquetanque-1;
+    }
     //Movimientos del player
     if (KeyA.isDown)
     {
@@ -455,7 +465,12 @@ function atacar2()
         tanque.direccion.normalize();
         tanque.setVelocityX(velocidad * tanque.direccion.x);
         tanque.setVelocityY(velocidad * tanque.direccion.y);
-        vidaplayer=vidaplayer-1;
+        if(ataquetanque==0)
+        {
+          vidaplayer=vidaplayer-5;
+          vidas = vidas.setText('Vidas: '+ vidaplayer);
+          ataquetanque=100;
+        }
     }
 }
 
