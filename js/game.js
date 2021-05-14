@@ -535,6 +535,7 @@ function matar()
       if(vidatanque==1 && cdenemigo==0)
       {
         tanque.destroy();
+        tanquemed.destroy();
         seguir2=false;
         vidaenemigo2=false;
       }
