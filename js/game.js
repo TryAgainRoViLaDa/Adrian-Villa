@@ -170,10 +170,21 @@ function create() {
 
     //Enemigo tanque
     tanque = this.physics.add.sprite(1600,1400,'tanque').setScale(0.8);
-    tanque.body.setSize(200,200);
+    tanque.body.setSize(25,25,500,-100);
     this.physics.add.overlap(player,tanque,matar, null, this);
-    this.physics.add.overlap(player,tanque,perseguir2, null, this);
+    this.physics.add.overlap(player,tanque,perdervida, null, this);
     this.physics.add.collider(tanque, obstaculos);
+
+    //tanque mediano
+    tanquemed = this.physics.add.sprite(tanque.x,tanque.y,'tanquepeque').setScale(0.001);
+    this.physics.add.overlap(player,tanquemed,perdervida, null, this);
+    tanquemed.body.setSize(200000,200000);
+
+    //tanque grande
+    tanquepeque = this.physics.add.sprite(tanque.x,tanque.y,'tanquepeque').setScale(0.001);
+    this.physics.add.overlap(player,tanquepeque,perseguir2, null, this);
+    this.physics.add.overlap(player,tanquepeque,atacar2, null, this);
+    tanquepeque.body.setSize(400000,400000);
 
     //PUZLE
     antorcha1 = this.physics.add.sprite(1730,1030, 'hoguerapagada').setScale(0.8);
@@ -205,6 +216,7 @@ function update()
     todosloscd();
     conversar();
     moveplayer();
+    acosar();
 }
 
 function moveplayer()
@@ -498,20 +510,7 @@ function perseguir2()
    if(vidaenemigo2==true)
     {
         seguir2=true;
-        
-        if(ataquetanque==0)
-        {
-          vidaplayer=vidaplayer-3;
-          vidas = vidas.setText('Vidas: '+ vidaplayer);
-          ataquetanque=100;
-
-          if (vidaplayer <= 0) 
-          {
-            player.destroy();
-            inmovil = true;
-            personajevivo=false;
-          }
-        }
+        tanquepeque.destroy();
     }
 }
 
@@ -644,4 +643,27 @@ function aumentarVida(objeto1, objeto2)
     vidas = vidas.setText('Vidas: '+ vidaplayer);
     objeto2.destroy();
     }
+}
+
+function perdervida()
+{
+  if(ataquetanque==0)
+        {
+          vidaplayer=vidaplayer-3;
+          vidas = vidas.setText('Vidas: '+ vidaplayer);
+          ataquetanque=100;
+
+          if (vidaplayer <= 0) 
+          {
+            player.destroy();
+            inmovil = true;
+            personajevivo=false;
+          }
+        }
+}
+
+function acosar()
+{
+  tanquemed.x=tanque.x;
+  tanquemed.y=tanque.y;
 }
