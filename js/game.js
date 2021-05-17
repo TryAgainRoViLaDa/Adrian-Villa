@@ -51,8 +51,8 @@ var vidaenemigo=true;
 var golpeneemigo=0;
 var cdenemigo=0;
 var vidaenemigo2=true;
-var ataquetanque=0;
-var ataquebasico=0;
+var ataquetanque=50;
+var ataquebasico=50;
 
 var vidatanque=3;
 
@@ -71,6 +71,10 @@ var SBTime = 100;
 var inmovil = false;
 var personajevivo=true;
 
+var mision=false;
+var cdf=0;
+var finalc=false;
+
 function preload() 
 {
     this.load.image('gameTiles', 'tileset/NatureTileset.png');
@@ -79,14 +83,23 @@ function preload()
     this.load.image('moneda', 'assets/monedas.png');
     this.load.image('cerdo', 'assets/cerdo.png');
     this.load.image('NPC', 'assets/NPC.png');
-    this.load.image('texto', 'assets/bafarada1.png');
-    this.load.image('texto2', 'assets/bafarada2.png');
     this.load.image('enemigobasico', 'assets/enemigo.png');
     this.load.image('cofre', 'assets/cofre.png');     
     this.load.image('tanque', 'assets/tanque.png');
-    this.load.image('hoguerapagada', 'assets/hoguera1.png');
-    this.load.image('hogueraencendida', 'assets/hoguera8.png');
     this.load.image('heart', 'assets/hearth.png');
+
+    this.load.image('texto1', 'assets/texto1.png');
+    this.load.image('texto2', 'assets/texto2.png');
+    this.load.image('texto3', 'assets/texto3.png');
+    this.load.image('texto4', 'assets/texto4.png');
+    this.load.image('texto5', 'assets/texto5.png');
+
+    this.load.image('tronco', 'assets/obstaculo.png');
+
+    this.load.image('hoguerapagada', 'assets/hoguera1.png');
+    this.load.image('hogueraencendida', 'assets/hogueraencendida.png');
+    this.load.atlas('encender','assets/encender.png', 'assets/encender_atlas.json');
+
 }
    
 function create() {
@@ -160,6 +173,7 @@ function create() {
     this.physics.add.overlap(player, NPC, interaccion, null, this);
     this.physics.add.overlap(player, NPC, hablar, null, this);
     this.physics.add.overlap(player, NPC, pasar, null, this);
+    this.physics.add.overlap(player, NPC, recogermision, null, this);
 
     //Enemigo basico
     enemigobasico = this.physics.add.sprite(1900,1500,'enemigobasico').setScale(0.15);
@@ -201,6 +215,23 @@ function create() {
     heartList = this.physics.add.group();
 
     this.physics.add.overlap(player, heartList, aumentarVida, null, this);
+
+    tronco = this.physics.add.sprite(1615,560, 'tronco').setScale(1);
+    tronco.body.setSize(50,50);
+
+    this.physics.add.overlap(player, tronco, nopasar, null, this);
+
+    //Animación encender 
+    this.anims.create({
+        key:'encender',
+        frames: this.anims.generateFrameNames('encender', {
+            prefix: 'hoguera',
+            start: 0,
+            end: 6,
+        }),
+        repeat:0,
+        frameRate:10
+    });
 }
 
 function update()
@@ -299,6 +330,18 @@ function todosloscd()
     if(cdenemigo>0)
     {
       cdenemigo=cdenemigo-1;
+    }
+
+    //Variable conversación
+    if(cd2>0)
+    {
+      cd2=cd2-1;
+    }
+
+    //Variable final conversación
+    if(cdf>0)
+    {
+      cdf=cdf-1;
     }
     
 }
@@ -404,7 +447,7 @@ function hablar()
 {
     if(KeyE.isDown && cd==0 && mensaje==0 && inicio==0)
     {
-        texto = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto');
+        texto = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto1');
         texto.setScale(0.3);
         cd=100;
         mensaje=1;
@@ -421,8 +464,36 @@ function pasar()
         scoreText.destroy();
         texto2 = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto2');
         texto2.setScale(0.3);
-        cd2=200;
-        mensaje=0;
+        cd2=100;
+        mensaje=2;
+    }
+
+    if(SPACE.isDown && mensaje==2 && cd2==0)
+    {
+        texto2.destroy();
+        scoreText.destroy();
+        texto3 = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto3');
+        texto3.setScale(0.3);
+        cd2=100;
+        mensaje=3;
+    } 
+
+    if(SPACE.isDown && mensaje==3 && cd2==0)
+    {
+        texto3.destroy();
+        scoreText.destroy();
+        texto4 = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto4');
+        texto4.setScale(0.3);
+        cd2=100;
+        mensaje=4;
+        finalconversacion=false;
+    } 
+
+    if(SPACE.isDown && mensaje==4 && cd2==0)
+    {
+        texto4.destroy();
+        scoreText.destroy();
+        mensaje=5;
         finalconversacion=false;
     }   
 }
@@ -458,7 +529,7 @@ function perseguir()
         {
           vidaplayer=vidaplayer-1;
           vidas = vidas.setText('Vidas: '+ vidaplayer);
-          ataquebasico=80;
+          ataquebasico=120;
 
           if (vidaplayer <= 0) 
           {
@@ -494,6 +565,7 @@ function matarpeque()
         enemigobasico.destroy();
         seguir=false;
         vidaenemigo=false;
+        mision=true;
         }
         
         if(vidaplayer<10)
@@ -559,8 +631,8 @@ function puzle1()
     if(KeyE.isDown && pieza==0)
     {
         pieza=1;
-        //antorcha1.destroy;
         antorchae1 = this.physics.add.sprite(1730,1030, 'hogueraencendida').setScale(0.8);
+        antorchae1.play('encender');
     }
 }
 
@@ -569,8 +641,8 @@ function puzle2()
     if(KeyE.isDown && pieza==1)
     {
         pieza=2;
-        antorcha2.destroy;
         antorchae2 = this.physics.add.sprite(2340,810, 'hogueraencendida').setScale(0.8);
+        antorchae2.play('encender');
     }
 }
 
@@ -579,8 +651,8 @@ function puzle3()
     if(KeyE.isDown && pieza==2)
     {
         pieza=3;
-        antorcha3.destroy;
         antorchae3 = this.physics.add.sprite(1695,195, 'hogueraencendida').setScale(0.8);
+        antorchae3.play('encender');
     }
 }
 
@@ -589,8 +661,8 @@ function puzle4()
     if(KeyE.isDown && pieza==3)
     {
         pieza=4;
-        antorcha4.destroy;
         antorchae4 = this.physics.add.sprite(2180,355, 'hogueraencendida').setScale(0.8);
+        antorchae4.play('encender');
         cofre = this.physics.add.sprite(1860, 470, 'cofre').setScale(0.4);
     }
 }
@@ -652,7 +724,7 @@ function perdervida()
         {
           vidaplayer=vidaplayer-3;
           vidas = vidas.setText('Vidas: '+ vidaplayer);
-          ataquetanque=100;
+          ataquetanque=150;
 
           if (vidaplayer <= 0) 
           {
@@ -667,4 +739,29 @@ function acosar()
 {
   tanquemed.x=tanque.x;
   tanquemed.y=tanque.y;
+}
+
+function recogermision()
+{
+  if(mision==true)
+  {
+    if(KeyE.isDown && mensaje==5 && cdf==0)
+    {
+        texto5 = this.physics.add.sprite(NPC.x+50, NPC.y-100, 'texto5');
+        texto5.setScale(0.3);
+        cdf=100;
+        finalc=true;   
+    }
+    if(SPACE.isDown && finalc==true)
+    {
+      texto5.destroy();
+      scoreText.destroy();
+      mision=false;
+    }
+  }
+}
+
+function nopasar()
+{
+  player.x=player.x+30;
 }

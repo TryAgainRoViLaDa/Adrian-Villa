@@ -1,0 +1,86 @@
+{
+    "frames": [
+        {
+            "filename": "hoguera1",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 0,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "hoguera2",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 338,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "hoguera3",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 0,
+                "y": 338
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "hoguera4",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 338,
+                "y": 338
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "hoguera5",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 676,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "hoguera6",
+            "frame": {
+                "w": 338,
+                "h": 338,
+                "x": 676,
+                "y": 338
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        }
+    ],
+    "meta": {
+        "description": "Atlas generado con Atlas Packer Gamma V2",
+        "web": "https://gammafp.github.io/atlas-packer-phaser/"
+    }
+}
