@@ -74,6 +74,7 @@ var personajevivo=true;
 var mision=false;
 var cdf=0;
 var finalc=false;
+var fuego=0;
 
 function preload() 
 {
@@ -99,6 +100,7 @@ function preload()
     this.load.image('hoguerapagada', 'assets/hoguera1.png');
     this.load.image('hogueraencendida', 'assets/hogueraencendida.png');
     this.load.atlas('encender','assets/encender.png', 'assets/encender_atlas.json');
+    this.load.atlas('movimientofuego','assets/movimientofuego.png', 'assets/movimientofuego_atlas.json');
 
 }
    
@@ -201,10 +203,10 @@ function create() {
     tanquepeque.body.setSize(400000,400000);
 
     //PUZLE
-    antorcha1 = this.physics.add.sprite(1730,1030, 'hoguerapagada').setScale(0.8);
-    antorcha2 = this.physics.add.sprite(2340,810, 'hoguerapagada').setScale(0.8);
-    antorcha3 = this.physics.add.sprite(1695,195, 'hoguerapagada').setScale(0.8);
-    antorcha4 = this.physics.add.sprite(2180,355, 'hoguerapagada').setScale(0.8);
+    antorcha1 = this.physics.add.sprite(1730,1050, 'hoguerapagada').setScale(0.8);
+    antorcha2 = this.physics.add.sprite(2335,820, 'hoguerapagada').setScale(0.8);
+    antorcha3 = this.physics.add.sprite(1695,215, 'hoguerapagada').setScale(0.8);
+    antorcha4 = this.physics.add.sprite(2175,380, 'hoguerapagada').setScale(0.8);
     this.physics.add.overlap(player,antorcha1,puzle1, null, this);
     this.physics.add.overlap(player,antorcha2,puzle2, null, this);
     this.physics.add.overlap(player,antorcha3,puzle3, null, this);
@@ -232,6 +234,18 @@ function create() {
         repeat:0,
         frameRate:10
     });
+
+    //Animación fuego 
+    this.anims.create({
+        key:'movimientofuego',
+        frames: this.anims.generateFrameNames('movimientofuego', {
+            prefix: 'movimientofuego',
+            start: 0,
+            end: 3,
+        }),
+        repeat:-1,
+        frameRate:10
+    });
 }
 
 function update()
@@ -248,6 +262,7 @@ function update()
     conversar();
     moveplayer();
     acosar();
+    //movimientofuego();
 }
 
 function moveplayer()
@@ -631,8 +646,9 @@ function puzle1()
     if(KeyE.isDown && pieza==0)
     {
         pieza=1;
-        antorchae1 = this.physics.add.sprite(1730,1030, 'hogueraencendida').setScale(0.8);
+        antorchae1 = this.physics.add.sprite(1730,1050, 'hoguerapagada').setScale(0.8);
         antorchae1.play('encender');
+        fuego=1;
     }
 }
 
@@ -641,8 +657,9 @@ function puzle2()
     if(KeyE.isDown && pieza==1)
     {
         pieza=2;
-        antorchae2 = this.physics.add.sprite(2340,810, 'hogueraencendida').setScale(0.8);
+        antorchae2 = this.physics.add.sprite(2335,820, 'hoguerapagada').setScale(0.8);
         antorchae2.play('encender');
+        fuego=2;
     }
 }
 
@@ -651,8 +668,9 @@ function puzle3()
     if(KeyE.isDown && pieza==2)
     {
         pieza=3;
-        antorchae3 = this.physics.add.sprite(1695,195, 'hogueraencendida').setScale(0.8);
+        antorchae3 = this.physics.add.sprite(1695,215, 'hoguerapagada').setScale(0.8);
         antorchae3.play('encender');
+        fuego=3;
     }
 }
 
@@ -661,8 +679,9 @@ function puzle4()
     if(KeyE.isDown && pieza==3)
     {
         pieza=4;
-        antorchae4 = this.physics.add.sprite(2180,355, 'hogueraencendida').setScale(0.8);
+        antorchae4 = this.physics.add.sprite(2175,380, 'hoguerapagada').setScale(0.8);
         antorchae4.play('encender');
+        fuego=4;
         cofre = this.physics.add.sprite(1860, 470, 'cofre').setScale(0.4);
     }
 }
@@ -765,3 +784,23 @@ function nopasar()
 {
   player.x=player.x+30;
 }
+
+/*function movimientofuego()
+{
+  if(fuego==1)
+  {
+    antorchae1.play('movimientofuego');
+  }
+  if(fuego==2)
+  {
+    antorchae2.play('movimientofuego');
+  }
+  if(fuego==3)
+  {
+    antorchae3.play('movimientofuego');
+  }
+  if(fuego==4)
+  {
+    antorchae4.play('movimientofuego');
+  }
+}*/
