@@ -103,6 +103,8 @@ function preload()
     this.load.atlas('movimientofuego','assets/movimientofuego.png', 'assets/movimientofuego_atlas.json');
 
     this.load.atlas('ataquetanque','assets/ataquetanque.png', 'assets/ataquetanque_atlas.json');
+
+    this.load.atlas('tanquecaminar','assets/tanquecaminar.png', 'assets/tanquecaminar_atlas.json');
 }
    
 function create() {
@@ -258,6 +260,18 @@ function create() {
       }),
       frameRate: 10,
       repeat: 0
+    });
+
+    //Animación tanquecaminar
+    this.anims.create({
+      key: 'tanquecaminar',
+      frames: this.anims.generateFrameNames('tanquecaminar', { 
+      prefix: 'caminar',
+      start: 1,
+      end: 2,
+      }),
+      frameRate: 5,
+      repeat: -1
     });
 }
 
@@ -611,7 +625,17 @@ function perseguir2()
     {
         seguir2=true;
         tanquepeque.destroy();
+        animaciontanque();
     }
+}
+
+//tanque camina
+function animaciontanque()
+{
+  if(vidatanque>0)
+  {
+    tanque.play('tanquecaminar');
+  }
 }
 
 //tanque ataca
