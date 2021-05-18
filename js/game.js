@@ -102,6 +102,7 @@ function preload()
     this.load.atlas('encender','assets/encender.png', 'assets/encender_atlas.json');
     this.load.atlas('movimientofuego','assets/movimientofuego.png', 'assets/movimientofuego_atlas.json');
 
+    this.load.atlas('ataquetanque','assets/ataquetanque.png', 'assets/ataquetanque_atlas.json');
 }
    
 function create() {
@@ -245,6 +246,18 @@ function create() {
         }),
         repeat:-1,
         frameRate:10
+    });
+
+    //Animación ataquetanque
+    this.anims.create({
+      key: 'ataquetanque',
+      frames: this.anims.generateFrameNames('ataquetanque', { 
+      prefix: 'tanque',
+      start: 1,
+      end: 5,
+      }),
+      frameRate: 10,
+      repeat: 0
     });
 }
 
@@ -610,7 +623,6 @@ function atacar2()
         tanque.direccion.normalize();
         tanque.setVelocityX(velocidad * tanque.direccion.x);
         tanque.setVelocityY(velocidad * tanque.direccion.y);
-        
     }
 }
 
@@ -740,7 +752,8 @@ function aumentarVida(objeto1, objeto2)
 function perdervida()
 {
   if(ataquetanque==0)
-        {
+        { 
+          tanque.play('ataquetanque');
           vidaplayer=vidaplayer-3;
           vidas = vidas.setText('Vidas: '+ vidaplayer);
           ataquetanque=150;
@@ -776,6 +789,7 @@ function recogermision()
       texto5.destroy();
       scoreText.destroy();
       mision=false;
+      tronco.destroy();
     }
   }
 }
@@ -803,4 +817,5 @@ function nopasar()
   {
     antorchae4.play('movimientofuego');
   }
+
 }*/
