@@ -84,7 +84,7 @@ function preload()
     this.load.image('moneda', 'assets/monedas.png');
     this.load.image('cerdo', 'assets/cerdo.png');
     this.load.image('NPC', 'assets/NPC.png');
-    this.load.image('enemigobasico', 'assets/enemigo.png');
+    this.load.image('enemigobasico', 'assets/basico0.png');
     this.load.image('cofre', 'assets/cofre.png');     
     this.load.image('tanque', 'assets/tanque.png');
     this.load.image('heart', 'assets/hearth.png');
@@ -105,6 +105,8 @@ function preload()
     this.load.atlas('ataquetanque','assets/ataquetanque.png', 'assets/ataquetanque_atlas.json');
 
     this.load.atlas('tanquecaminar','assets/tanquecaminar.png', 'assets/tanquecaminar_atlas.json');
+
+    this.load.atlas('ataqueb','assets/ataquebasico.png', 'assets/ataquebasico_atlas.json');
 }
    
 function create() {
@@ -272,6 +274,18 @@ function create() {
       }),
       frameRate: 5,
       repeat: -1
+    });
+
+    //Animación ataque basico
+    this.anims.create({
+      key: 'ataqueb',
+      frames: this.anims.generateFrameNames('ataqueb', { 
+      prefix: 'basico',
+      start: 0,
+      end: 1,
+      }),
+      frameRate: 5,
+      repeat: 0
     });
 }
 
@@ -569,6 +583,7 @@ function perseguir()
         seguir=true;
         if(ataquebasico==0)
         {
+          enemigobasico.play('ataqueb');
           vidaplayer=vidaplayer-1;
           vidas = vidas.setText('Vidas: '+ vidaplayer);
           ataquebasico=120;
@@ -679,7 +694,7 @@ function matar()
 //PUZLE
 function puzle1()
 {
-    if(KeyE.isDown && pieza==0)
+    if(KeyE.isDown && pieza==0 && mision==true)
     {
         pieza=1;
         antorchae1 = this.physics.add.sprite(1730,1050, 'hoguerapagada').setScale(0.8);
